@@ -16,17 +16,13 @@ from ratelimit import (
 )
 
 
-# ---------------------------
-# Password generation
-# ---------------------------
+
 def generate_password(length=16):
     chars = string.ascii_letters + string.digits + string.punctuation
     return "".join(secrets.choice(chars) for _ in range(length))
 
 
-# ---------------------------
-# CLI Actions
-# ---------------------------
+
 def add_entry(vault):
     site = input("Site: ").strip()
     user = input("Username: ").strip()
@@ -79,9 +75,7 @@ def delete_entry(vault):
         print("Not found.")
 
 
-# ---------------------------
-# Login / App flow
-# ---------------------------
+
 def authenticate():
     """
     Enforces lockout + backoff.
@@ -130,22 +124,22 @@ def main():
             print("Master password created successfully.")
             break
 
-    # login loop
+   
     master_pw = None
     while master_pw is None:
         master_pw = authenticate()
 
-    # derive key
+  
     key = derive_key_pbkdf2(master_pw, salt)
 
-    # load vault
+
     try:
         vault = load_vault(key)
     except Exception as e:
         print("Vault error:", e)
         return
 
-    # main menu
+  
     while True:
         print("\n 1) Add\n 2) View\n 3) Update\n 4) Delete\n 5) Generate Only\n 6) Exit")
         choice = input("> ").strip()

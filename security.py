@@ -13,9 +13,7 @@ SALT_FILE = "salt.bin"
 PBKDF2_ITERATIONS = 200_000
 KEY_LENGTH = 32
 
-# ---------------------------
-# Salt handling
-# ---------------------------
+
 def ensure_salt():
     if not os.path.exists(SALT_FILE):
         salt = secrets.token_bytes(16)
@@ -25,9 +23,7 @@ def ensure_salt():
     with open(SALT_FILE, "rb") as f:
         return f.read()
 
-# ---------------------------
-# PBKDF2 Key Derivation
-# ---------------------------
+
 def derive_key_pbkdf2(master_password: str, salt: bytes) -> bytes:
     key = pbkdf2_hmac("sha256",
                       master_password.encode(),
@@ -36,9 +32,6 @@ def derive_key_pbkdf2(master_password: str, salt: bytes) -> bytes:
                       dklen=KEY_LENGTH)
     return urlsafe_b64encode(key)
 
-# ---------------------------
-# Master password functions
-# ---------------------------
 def create_master_password(password: str):
     hashed = bcrypt.hashpw(password.encode(), bcrypt.gensalt())
     with open(MASTER_FILE, "wb") as f:
@@ -51,9 +44,7 @@ def verify_master_password(password: str) -> bool:
         stored_hash = f.read()
     return bcrypt.checkpw(password.encode(), stored_hash)
 
-# ---------------------------
-# Vault encryption/decryption
-# ---------------------------
+
 def encrypt_data(key: bytes, data: dict) -> bytes:
     f = Fernet(key)
     return f.encrypt(json.dumps(data).encode())
@@ -78,7 +69,7 @@ def save_vault(key: bytes, vault: dict):
     with open(VAULT_FILE, "wb") as f:
         f.write(encrypted)
 
-# Make sure all functions are available
+
 __all__ = [
     'ensure_salt',
     'derive_key_pbkdf2',
